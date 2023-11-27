@@ -6,8 +6,16 @@ def my_gcm(a, b):
 
 n = int(input())
 num = []
+
 for _ in range(n):
     num.append(int(input()))
-print(num)
 
-print(my_gcm(num[0], num[1]))
+a = num[0]
+
+if n != 1:
+    for i in range(1, n):
+        p = max(a, num[i])
+        q = min(a, num[i])
+        a = my_gcm(p, q)
+
+print(a)
