@@ -1,3 +1,4 @@
+"""
 def extgcd(a, b):
     if b == 0:
         return 1, 0, a
@@ -14,7 +15,7 @@ def modpow(a, b, n):
         b >>= 1
         a = (a*a)%n
     return ans
-
+"""
 """
 send message : s = "test"
 t --ord--> ord(t)=116 ---bin--> bin(116)=111 0100 ---zfill--> zfill(7)
@@ -32,48 +33,67 @@ n_prime = (p-1) * (q-1)
 gcd(e, n_prime) = 1
 """
 
-send_message = "tttr"
-send_message_bin = ""
+def extgcd(a, b):
+    if b == 0:
+        return a, 1, 0
+    else:
+        g, x, y = extgcd(b, a%b)
+        u = y
+        v = x - a//b * y
+        return g, u, v
 
-for c in send_message:
-    send_message_bin = send_message_bin + str(bin(ord(c)))[2:].zfill(7)
+def modpow(a, n, mod):
+    ans = 1
+    while n>0:
+        if n&1:
+            ans = (ans*a) % mod
+        n >>= 1
+        a = (a*a) % mod
 
-M = int(send_message_bin.ljust(28, "0"), 2)
+    return ans
 
-print(send_message)
-
-p = 23917
-q = 23929
+p = 10000253
+q = 10000261
 n = p*q
-n_prime = (p-1)*(q-1)
-e = 8731
 
-print(f"n: {n}")
-print(f"p: {p}")
-print(f"q: {q}")
-print(f"n': {n_prime}")
-print(f"e: {e}")
+"""
+p' = p-1
+q' = q-1
+n' = p' * q'
+"""
+p_prime = p-1
+q_prime = q-1
+n_prime = p_prime * q_prime
 
-d, y, g = extgcd(e, n_prime)
+"""
+e : gcd(e, n') = 1
+d : e^{-1} (mod n) --> e * d ≡ 1 (mod n') --> e * x + n' * y = 1 
+"""
+e = 7
+g, d, y = extgcd(e, n_prime)
 d = d%n_prime
-
-print(f"gcd(e, n')={g}")
-print(f"d:", d)
-print(f"de= {d*e%n_prime} mod(n')")
-
+print(f"g:{g}")
+print(f"d:{d}")
+"""
+send_message = abcd
+a --> ASCⅡコード：97 --> 0b1100001 = s0
+b --> ASCⅡコード：98 --> 0b1100010 = s1
+c --> ASCⅡコード：99 --> 0b1100011 = s2
+d --> ASCⅡコード：100 --> 0b1100100 = s3
+send_message_bin = s0 + s1 + s2 + s3 = 1100001 1100010 1100011 1100100 
+send_message_int = 0b1100001110001011000111100100 = 205042148 --> M
+"""
+send_message = "abcd"
+send_message_bin = ""
+for i in range(4):
+    send_message_bin += format(ord(send_message[i]), '07b')
+send_message_int = int(send_message_bin, 2)
+M = send_message_int
+"""
+E = M^e (mod n) 
+"""
 E = modpow(M, e, n)
-print(f"M:", M)
-print(f"E:", E)
-decode_M = modpow(E, d, n)
-print(f"deM:", decode_M)
-
-ans_bin = str(bin(decode_M))[2:].zfill(28)
-print(ans_bin)
-ans_str = ""
-
-for i in range(0, 22, 7):
-    ans_chr_bin = ans_bin[i:i+7]
-    if ans_chr_bin != "0000000":
-        ans_str += chr(int(ans_chr_bin, 2))
-
-print(ans_str)
+print(send_message)
+print(f"M:{M}")
+print(f"n:{n}, e:{e}, E:{E}")
+print(f"decode:{modpow(E, d, n)}")
